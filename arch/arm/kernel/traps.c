@@ -30,11 +30,13 @@
 #include <asm/system.h>
 #include <asm/unistd.h>
 #include <asm/traps.h>
+#include <asm/ptrace.h>
 #include <asm/unwind.h>
 #include <asm/tls.h>
 #include <asm/opcodes.h>
 
 #include "signal.h"
+
 
 static const char *handler[]= {
 	"prefetch abort",
@@ -184,7 +186,7 @@ static void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk)
 		tsk = current;
 
 	if (regs) {
-		fp = regs->ARM_fp;
+		fp = frame_pointer(regs);
 		mode = processor_mode(regs);
 	} else if (tsk != current) {
 		fp = thread_saved_fp(tsk);
@@ -628,7 +630,7 @@ asmlinkage int arm_syscall(int no, struct pt_regs *regs)
 		dump_instr("", regs);
 		if (user_mode(regs)) {
 			__show_regs(regs);
-			c_backtrace(regs->ARM_fp, processor_mode(regs));
+			c_backtrace(frame_pointer(regs), processor_mode(regs));
 		}
 	}
 #endif
