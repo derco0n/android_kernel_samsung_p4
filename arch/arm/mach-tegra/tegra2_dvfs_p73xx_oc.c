@@ -56,6 +56,7 @@ static const int cpu_millivolts_process1[MAX_DVFS_FREQS] =
 	950,   // 912 Mhz
 	1000,  // 1000 Mhz
 	1175,  // 1200 Mhz
+	1200,  // 1300 Mhz
 	1200,  // 1400 Mhz
 };
 
@@ -190,7 +191,7 @@ static struct dvfs dvfs_init[] = {
 
 	/* The P75xx devices use these tables */
 	CPU_DVFS("cpu", 1, 0, MHZ, 380, 380, 503, 503, 655, 655,  798,  798,  902,  902,  960,  1000),
-	CPU_DVFS_OC("cpu", 1, 1, MHZ, cpu_millivolts_process1, 216, 312, 456, 608, 760, 816, 912, 1000, 1200, 1400),
+	CPU_DVFS_OC("cpu", 1, 1, MHZ, cpu_millivolts_process1, 216, 312, 456, 608, 760, 816, 912, 1000, 1200, 1300, 1400),
 	CPU_DVFS("cpu", 1, 2, MHZ,  598, 598, 750, 750, 893, 893,  1000),
 	CPU_DVFS("cpu", 1, 3, MHZ,  730, 760, 845, 845, 940, 1000),
 

@@ -2052,6 +2052,11 @@ static struct clk_pll_freq_table tegra_pll_x_freq_table[] = {
 	{ 19200000, 1400000000, 875, 12,  1, 8},
 	{ 26000000, 1400000000, 700, 13,  1, 12},
 
+	/* 1.3 GHz */
+	{ 12000000, 1300000000, 650, 6,   1, 12},
+	{ 13000000, 1300000000, 1000, 10,   1, 12},
+	{ 19200000, 1300000000, 677, 10,  1, 8},
+	{ 26000000, 1300000000, 600, 12,  1, 12},
 #endif
 	/* 1.2 GHz */
 	{ 12000000, 1200000000, 600,  6,  1, 12},
@@ -2797,6 +2802,20 @@ static struct cpufreq_frequency_table freq_table_1p2GHz[] = {
 	{ 9, CPUFREQ_TABLE_END },
 };
 
+static struct cpufreq_frequency_table freq_table_1p3GHz[] = {
+	{ 0, 216000 },
+	{ 1, 312000 },
+	{ 2, 456000 },
+	{ 3, 608000 },
+	{ 4, 760000 },
+	{ 5, 816000 },
+	{ 6, 912000 },
+	{ 7, 1000000 },
+	{ 8, 1200000 },
+	{ 9, 1300000 },
+	{ 10, CPUFREQ_TABLE_END },
+};
+
 static struct cpufreq_frequency_table freq_table_1p4GHz[] = {
 	{ 0, 216000 },
 	{ 1, 312000 },
@@ -2807,8 +2826,9 @@ static struct cpufreq_frequency_table freq_table_1p4GHz[] = {
 	{ 6, 912000 },
 	{ 7, 1000000 },
 	{ 8, 1200000 },
-	{ 9, 1400000 },
-	{ 10, CPUFREQ_TABLE_END },
+	{ 9, 1300000 },
+	{ 10, 1400000 },
+	{ 11, CPUFREQ_TABLE_END },
 };
 
 static struct cpufreq_frequency_table freq_table_1p5GHz[] = {
@@ -2821,9 +2841,10 @@ static struct cpufreq_frequency_table freq_table_1p5GHz[] = {
 	{ 6, 912000 },
 	{ 7, 1000000 },
 	{ 8, 1200000 },
-	{ 9, 1400000 },
-	{ 10, 1500000 },
-	{ 11, CPUFREQ_TABLE_END },
+	{ 9, 1300000 },
+	{ 10, 1400000 },
+	{ 11, 1500000 },
+	{ 12, CPUFREQ_TABLE_END },
 };
 
 static struct cpufreq_frequency_table freq_table_1p6GHz[] = {
@@ -2836,10 +2857,11 @@ static struct cpufreq_frequency_table freq_table_1p6GHz[] = {
 	{ 6, 912000 },
 	{ 7, 1000000 },
 	{ 8, 1200000 },
-	{ 9, 1400000 },
-	{ 10, 1500000 },
-	{ 11, 1600000 },
-	{ 12, CPUFREQ_TABLE_END },
+	{ 9, 1300000 },
+	{ 10, 1400000 },
+	{ 11, 1500000 },
+	{ 12, 1600000 },
+	{ 13, CPUFREQ_TABLE_END },
 };
 
 static struct tegra_cpufreq_table_data cpufreq_tables[] = {
@@ -2853,6 +2875,7 @@ static struct tegra_cpufreq_table_data cpufreq_tables[] = {
 #elif defined(CONFIG_P73XX_OVERCLOCK)
 	{ freq_table_1p0GHz, 2, 6, 0, 8 },
 	{ freq_table_1p2GHz, 2, 7, 0, 9 },
+	{ freq_table_1p3GHz, 2, 6, 0, 8 },
 	{ freq_table_1p4GHz, 2, 6, 0, 8 },
 #else
 	{ freq_table_1p0GHz, 2, 6, 0, 7 },
