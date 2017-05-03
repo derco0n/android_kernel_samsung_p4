@@ -2731,6 +2731,75 @@ err0:
 	return ERR_PTR(err);
 }
 
+static int usb_enable_phy_clk(struct tegra_usb_phy *phy)
+{
+	int val;
+	int ret;
+	void __iomem *addr = phy->regs + USB_SUSP_CTRL;
+
+	/* USB_SUSP_CLR bit requires pulse write */
+	val = readl(addr);
+	writel(val | USB_SUSP_CLR, addr);
+
+	/* we need check both PHY clock and USB core clock is ON */
+	ret = utmi_wait_register(addr, USB_PHY_CLK_VALID, USB_PHY_CLK_VALID);
+	if (ret)
+		pr_err("failed turn on EHCI port PHY clock(CLK_VALID)\n");
+
+	ret = utmi_wait_register(addr, USB_CLKEN, USB_CLKEN);
+	if (ret)
+		pr_err("failed turn on EHCI port PHY clock (CLKEN)\n");
+
+	val = readl(addr);
+	writel(val & (~USB_SUSP_CLR), addr);
+
+	return ret;
+}
+
+static int usb_disable_phy_clk(struct tegra_usb_phy *phy)
+{
+	int val;
+	int ret;
+	void __iomem *base = phy->regs;
+
+	switch (phy->instance) {
+	case 0:
+		/* USB_SUSP_SET bit requires pulse write */
+		val = readl(base + USB_SUSP_CTRL);
+		writel(val | USB_SUSP_SET, base + USB_SUSP_CTRL);
+		udelay(10);
+		writel(val & (~USB_SUSP_SET), base + USB_SUSP_CTRL);
+		break;
+	case 1:
+	case 2:
+		val = readl(base + USB_PORTSC1);
+		writel(val | USB_PORTSC1_PHCD, base + USB_PORTSC1);
+		break;
+	default:
+		pr_err("unknow USB instance: %d\n", phy->instance);
+	}
+
+	ret = utmi_wait_register(base + USB_SUSP_CTRL,
+			USB_PHY_CLK_VALID, 0);
+	if (ret)
+		pr_err("failed turn off EHCI port PHY clock\n");
+
+	return ret;
+}
+
+int tegra_usb_set_phy_clock(struct tegra_usb_phy *phy, char clock_on)
+{
+	int ret;
+
+	BUG_ON(phy == NULL);
+	if (clock_on)
+		ret = usb_enable_phy_clk(phy);
+	else
+		ret = usb_disable_phy_clk(phy);
+
+	return ret;
+}
+
 int tegra_usb_phy_power_on(struct tegra_usb_phy *phy, bool is_dpd)
 {
 	int ret = 0;
