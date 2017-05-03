@@ -1435,7 +1435,7 @@ static int tegra_ehci_probe(struct platform_device *pdev)
 	if (instance == 0)
 		clk_set_rate(tegra->emc_clk, 600000000);
 	else
-		clk_set_rate(tegra->emc_clk, 150000000);
+		clk_set_rate(tegra->emc_clk, 300000000);
 #else
 	/* Set DDR busy hints to 100MHz. For Tegra 3x SOC DDR rate equals to EMC rate */
 	clk_set_rate(tegra->emc_clk, 100000000);
