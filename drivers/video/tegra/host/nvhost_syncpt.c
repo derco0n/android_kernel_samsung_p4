@@ -142,7 +142,8 @@ static bool syncpt_update_min_is_expired(
  * Main entrypoint for syncpoint value waits.
  */
 int nvhost_syncpt_wait_timeout(struct nvhost_syncpt *sp, u32 id,
-			u32 thresh, u32 timeout, u32 *value)
+			u32 thresh, u32 timeout, u32 *value,
+			struct timespec *ts)
 {
 	DECLARE_WAIT_QUEUE_HEAD_ONSTACK(wq);
 	void *ref;
@@ -157,6 +158,8 @@ int nvhost_syncpt_wait_timeout(struct nvhost_syncpt *sp, u32 id,
 	if (nvhost_syncpt_is_expired(sp, id, thresh)) {
 		if (value)
 			*value = nvhost_syncpt_read_min(sp, id);
+		if (ts)
+			ktime_get_ts(ts);
 		return 0;
 	}
 
@@ -168,6 +171,8 @@ int nvhost_syncpt_wait_timeout(struct nvhost_syncpt *sp, u32 id,
 	if (nvhost_syncpt_is_expired(sp, id, thresh)) {
 		if (value)
 			*value = val;
+		if (ts)
+			ktime_get_ts(ts);
 		goto done;
 	}
 
@@ -204,6 +209,12 @@ int nvhost_syncpt_wait_timeout(struct nvhost_syncpt *sp, u32 id,
 		if (remain > 0 || nvhost_syncpt_is_expired(sp, id, thresh)) {
 			if (value)
 				*value = nvhost_syncpt_read_min(sp, id);
+			if (ts) {
+				err = nvhost_intr_release_time(ref, ts);
+				if (err)
+					ktime_get_ts(ts);
+			}
+
 			err = 0;
 			break;
 		}

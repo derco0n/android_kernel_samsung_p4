@@ -23,6 +23,7 @@
 #include <linux/irq.h>
 #include <linux/io.h>
 #include <asm/mach/irq.h>
+#include <linux/ktime.h>
 
 #include "nvhost_intr.h"
 #include "dev.h"
@@ -150,6 +151,8 @@ irqreturn_t t20_intr_syncpt_thresh_isr(int irq, void *dev_id)
 		sync_regs + HOST1X_SYNC_SYNCPT_THRESH_INT_DISABLE);
 	writel(BIT(id),
 		sync_regs + HOST1X_SYNC_SYNCPT_THRESH_CPU0_INT_STATUS);
+
+	ktime_get_ts(&syncpt->isr_recv);
 
 	return IRQ_WAKE_THREAD;
 }
