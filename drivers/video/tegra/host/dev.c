@@ -125,7 +125,30 @@ static int nvhost_ioctl_ctrl_syncpt_waitex(struct nvhost_ctrl_userctx *ctx,
 		timeout = (u32)msecs_to_jiffies(args->timeout);
 
 	return nvhost_syncpt_wait_timeout(&ctx->dev->syncpt, args->id,
-					args->thresh, timeout, &args->value);
+					args->thresh, timeout, &args->value,
+					NULL);
+}
+
+static int nvhost_ioctl_ctrl_syncpt_waitmex(struct nvhost_ctrl_userctx *ctx,
+	struct nvhost_ctrl_syncpt_waitmex_args *args)
+{
+	u32 timeout;
+	int err;
+	struct timespec ts;
+	if (args->id >= ctx->dev->syncpt.nb_pts)
+		return -EINVAL;
+	if (args->timeout == NVHOST_NO_TIMEOUT)
+		timeout = MAX_SCHEDULE_TIMEOUT;
+	else
+		timeout = (u32)msecs_to_jiffies(args->timeout);
+
+	err = nvhost_syncpt_wait_timeout(&ctx->dev->syncpt, args->id,
+					args->thresh, timeout, &args->value,
+					&ts);
+	args->tv_sec = ts.tv_sec;
+	args->tv_nsec = ts.tv_nsec;
+
+	return err;
 }
 
 static int nvhost_ioctl_ctrl_module_mutex(struct nvhost_ctrl_userctx *ctx,
@@ -277,6 +300,9 @@ static long nvhost_ctrlctl(struct file *filp,
 		break;
 	case NVHOST_IOCTL_CTRL_SYNCPT_READ_MAX:
 		err = nvhost_ioctl_ctrl_syncpt_read_max(priv, (void *)buf);
+		break;
+	case NVHOST_IOCTL_CTRL_SYNCPT_WAITMEX:
+		err = nvhost_ioctl_ctrl_syncpt_waitmex(priv, (void *)buf);
 		break;
 	default:
 		err = -ENOTTY;
