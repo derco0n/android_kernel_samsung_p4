@@ -704,7 +704,7 @@ static ssize_t show_frequency_voltage_table(struct cpufreq_policy *policy, char 
 		mv_index = get_vindex_of_cpu_freq(freq * 1000);
 
 		if (mv_index < 0 || mv_index >= cpu_dvfs->num_freqs) {
-			pr_err("%s: No millivolt entry found for frequency %li\n",
+			pr_err("%s: No millivolt entry found for frequency %lu\n",
 				__func__, cpu_dvfs->freqs[i]);
 
 			return 0;
@@ -750,7 +750,7 @@ static ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf)
 		mv_index = get_vindex_of_cpu_freq(freq * 1000);
 
 		if (mv_index < 0 || mv_index >= cpu_dvfs->num_freqs) {
-			pr_err("%s: No millivolt entry found for frequency %li\n",
+			pr_err("%s: No millivolt entry found for frequency %u\n",
 				__func__, freq);
 
 			return sprintf(buf, "Error finding voltage entry for"
@@ -786,7 +786,7 @@ static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, const char *buf,
 	struct dvfs *cpu_dvfs = cpu_clk->dvfs;
 
 	if(user_uv_mv_table == NULL)
-		return sprintf(buf, "No user_uv_mv_table allocated.\n");
+		return sprintf((char*)buf, "No user_uv_mv_table allocated.\n");
 
 	pr_info("store_UV_mV_table %s\n", buf);
 
@@ -799,7 +799,7 @@ static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, const char *buf,
 		mv_index = get_vindex_of_cpu_freq(freq * 1000);
 
 		if (mv_index < 0 || mv_index >= cpu_dvfs->num_freqs) {
-			pr_err("%s: No millivolt entry found for frequency %li\n",
+			pr_err("%s: No millivolt entry found for frequency %lu\n",
 				__func__, cpu_dvfs->freqs[i]);
 
 			continue;
@@ -2370,20 +2370,6 @@ static int __init cpufreq_core_init(void)
 			if (user_uv_mv_table != NULL) {
 				printk("Tegra2_voltage_control: Allocate user voltage table. "
 					"rows: %d\n", sz);
-
-				// for(i = 0; i < cpu_dvfs->num_freqs; i++) {
-				// 	user_uv_mv_table[i] = cpu_dvfs->millivolts[i];
-
-				// 	// check voltage range
-				// 	if (user_uv_mv_table[i] < CPUMVMIN ||
-				// 		user_uv_mv_table[i] > CPUMVMAX) {
-				// 		printk("Tegra2_voltage_control: Voltage out of range. \
-				// 			index %d millivolts %d\n", i, user_uv_mv_table[i]);
-				// 		kfree(user_uv_mv_table);
-				// 		user_uv_mv_table = NULL;
-				// 		break;
-				// 	}
-				// }
 			} else {
 				printk("Tegra2_voltage_control: "
 					"Error allocating user voltage table\n");
