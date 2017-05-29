@@ -468,8 +468,10 @@ void input_event(struct input_dev *dev,
 	}
 #endif
 
-	if ((type == EV_KEY)&&((dev->name == "sec_key")||
-		(dev->name == "sec_power_key")||(dev->name == "sec_keyboard")))
+	if ((type == EV_KEY) &&
+			(!strncmp(dev->name, "sec_key", 7) ||
+			!(strncmp("sec_power_key", dev->name, 13) ||
+			!strncmp(dev->name,"sec_keyboard", 12))))
 		pr_info("[%s] %s\n", dev->name, value ? "P" : "R");
 
 	if (is_event_supported(type, dev->evbit, EV_MAX)) {
