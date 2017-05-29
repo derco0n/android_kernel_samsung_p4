@@ -971,7 +971,8 @@ void __init tegra_ram_console_debug_reserve(unsigned long ram_console_size)
 	if (ret)
 		goto fail;
 
-	pr_err("Reserve memory block to store kexec stuff %x %x\n", real_start, real_size);
+	pr_err("Reserve memory block to store kexec stuff %lx %lx\n",
+		real_start, real_size);
 
 	return;
 
