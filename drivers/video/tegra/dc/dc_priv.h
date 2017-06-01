@@ -24,6 +24,7 @@
 #include <linux/fb.h>
 #include <linux/completion.h>
 #include <linux/switch.h>
+#include <linux/kthread.h>
 
 #include <mach/dc.h>
 
@@ -127,7 +128,9 @@ struct tegra_dc {
 
 	struct completion		frame_end_complete;
 
-	struct work_struct		vblank_work;
+	struct kthread_worker	dc_worker;
+	struct task_struct		*dc_worker_thread;
+	struct kthread_work		vblank_work;
 
 	struct {
 		u64			underflows;
