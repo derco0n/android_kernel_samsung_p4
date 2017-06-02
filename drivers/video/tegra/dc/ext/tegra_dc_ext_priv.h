@@ -23,6 +23,7 @@
 #include <linux/list.h>
 #include <linux/mutex.h>
 #include <linux/poll.h>
+#include <linux/kthread.h>
 
 #include <mach/dc.h>
 #include <mach/nvmap.h>
@@ -55,7 +56,7 @@ struct tegra_dc_ext_win {
 	/* Current nvmap handle (if any) for Y, U, V planes */
 	struct nvmap_handle_ref	*cur_handle[TEGRA_DC_NUM_PLANES];
 
-	struct workqueue_struct	*flip_wq;
+	struct task_struct	*dc_win_worker_thread;
 
 	atomic_t		nr_pending_flips;
 };
@@ -69,6 +70,7 @@ struct tegra_dc_ext {
 	struct nvmap_client		*nvmap;
 
 	struct tegra_dc_ext_win		win[DC_N_WINDOWS];
+	struct kthread_worker		flip_worker;
 
 	struct {
 		struct tegra_dc_ext_user	*user;
