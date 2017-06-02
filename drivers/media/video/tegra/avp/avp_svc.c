@@ -711,7 +711,6 @@ err:
 int avp_svc_start(struct avp_svc_info *avp_svc)
 {
 	struct trpc_endpoint *ep;
-	struct sched_param param = { .sched_priority = 1 };
 	int ret;
 
 	avp_svc->nvmap_remote = nvmap_create_client(nvmap_dev, "avp_remote");
@@ -741,9 +740,6 @@ int avp_svc_start(struct avp_svc_info *avp_svc)
 		ret = -ENOMEM;
 		goto err_kthread;
 	}
-
-	sched_setscheduler(avp_svc->svc_thread, SCHED_FIFO, &param);
-
 	return 0;
 
 err_kthread:
