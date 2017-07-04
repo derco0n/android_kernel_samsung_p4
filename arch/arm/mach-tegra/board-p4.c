@@ -462,7 +462,7 @@ static struct tegra_i2c_platform_data p3_i2c3_platform_data = {
 static struct tegra_i2c_platform_data p3_dvc_platform_data = {
 	.adapter_nr	= 4,
 	.bus_count	= 1,
-	.bus_clk_rate	= { 100000, 0 },
+	.bus_clk_rate	= { 400000, 0 },
 	.is_dvc		= true,
 };
 
