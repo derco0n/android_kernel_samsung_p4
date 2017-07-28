@@ -22,7 +22,6 @@
 #include <linux/clk.h>
 #include <linux/err.h>
 #include <linux/mmc/host.h>
-#include <linux/mmc/sdhci.h>
 #include <linux/skbuff.h>
 
 #include <asm/mach-types.h>
@@ -33,8 +32,6 @@
 #include <mach/gpio-p4.h>
 #include "gpio-names.h"
 #include "board.h"
-
-struct mmc_host* wifi_mmc_host = NULL;
 
 #ifdef CONFIG_BROADCOM_WIFI_RESERVED_MEM
 
@@ -297,14 +294,11 @@ static int p3_wifi_status_register(
 		void (*callback)(int card_present, void *dev_id),
 		void *dev_id)
 {
-	struct sdhci_host *host = (struct sdhci_host *)dev_id;
-
 	printk(KERN_INFO "%s: start\n", __func__);
 	if (wifi_status_cb)
 		return -EAGAIN;
 	wifi_status_cb = callback;
 	wifi_status_cb_devid = dev_id;
-	wifi_mmc_host = (void*) host->mmc;
 	return 0;
 }
 

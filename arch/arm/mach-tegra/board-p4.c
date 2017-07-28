@@ -46,7 +46,6 @@
 #include <linux/vfs.h>
 #include <linux/file.h>
 #include <linux/tegra_uart.h>
-#include <linux/mmc/host.h>
 
 #include <linux/uaccess.h>
 #include <linux/spi/spi.h>
@@ -99,8 +98,6 @@
 #endif
 
 extern int p3_gpio_i2c_init(void);
-
-extern struct mmc_host* wifi_mmc_host;
 
 struct class *sec_class;
 EXPORT_SYMBOL(sec_class);
@@ -282,11 +279,6 @@ static int p3_notifier_call(struct notifier_block *this,
 	write_bootloader_mode(mode);
 
 	write_bootloader_message(_cmd, mode);
-
-	if (wifi_mmc_host) {
-		pr_info("%s: turn off wifi\n", __func__);
-		mmc_power_save_host(wifi_mmc_host);
-	}
 
 	return NOTIFY_DONE;
 }
