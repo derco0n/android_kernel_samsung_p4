@@ -2199,7 +2199,7 @@ void __init tegra_p3_reserve(void)
 		pr_warn("Cannot reserve first 4K of memory for safety\n");
 
 	tegra_reserve(32 * SZ_1M, SZ_8M + SZ_1M, SZ_16M);
-	tegra_ram_console_debug_reserve(SZ_1M);
+	tegra_ram_console_debug_reserve_start(SZ_1M, 0x2e600000);
 }
 
 #ifdef CONFIG_TARGET_LOCALE_KOR

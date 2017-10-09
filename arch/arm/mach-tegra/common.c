@@ -914,6 +914,28 @@ fail:
 	pr_err("Failed to reserve memory block for ram console\n");
 }
 
+void __init tegra_ram_console_debug_reserve_start(unsigned long ram_console_size, unsigned int start)
+{
+	struct resource *res;
+	long ret;
+
+	res = platform_get_resource(&ram_console_device, IORESOURCE_MEM, 0);
+	if (!res)
+		goto fail;
+	res->start = start;
+	res->end = res->start + ram_console_size - 1;
+	ret = memblock_remove(res->start, ram_console_size);
+	if (ret)
+		goto fail;
+
+	return;
+
+fail:
+	ram_console_device.resource = NULL;
+	ram_console_device.num_resources = 0;
+	pr_err("Failed to reserve memory block for ram console\n");
+}
+
 void __init tegra_ram_console_debug_init(void)
 {
 	int err;
