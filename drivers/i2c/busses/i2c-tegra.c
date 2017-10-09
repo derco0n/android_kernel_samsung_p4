@@ -946,7 +946,8 @@ static int tegra_i2c_probe(struct platform_device *pdev)
 
 #if defined(CONFIG_MACH_SAMSUNG_VARIATION_TEGRA)
 	if (i2c_dev->is_dvc)
-		i2c_dev->dvc_poweroff_rate = 12500;
+		// i2c_dev->dvc_poweroff_rate = 12500;
+		i2c_dev->dvc_poweroff_rate = 101563;
 #endif
 
 	init_completion(&i2c_dev->msg_complete);
