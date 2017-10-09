@@ -744,7 +744,6 @@ static void destroy_client(struct nvmap_client *client)
 		wait_count++;
 		smp_wmb();
 		wake_up_all(&wait_reclaim);
-		pr_info("%s wake_up_all() %d\n", __func__, wait_count);
 	}
 
 	for (i = 0; i < client->dev->nr_carveouts; i++)
