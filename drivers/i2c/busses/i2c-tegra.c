@@ -39,8 +39,6 @@
 #include <mach/clk.h>
 #include <mach/pinmux.h>
 
-#include "../../../arch/arm/mach-tegra/clock.h"
-
 #define TEGRA_I2C_TIMEOUT			(msecs_to_jiffies(1000))
 #define TEGRA_I2C_RETRIES			3
 #define BYTES_PER_FIFO_WORD			4
@@ -195,11 +193,6 @@ struct tegra_i2c_dev {
 	u16 hs_master_code;
 	int (*arb_recovery)(int scl_gpio, int sda_gpio);
 	struct tegra_i2c_bus busses[1];
-
-#if defined(CONFIG_MACH_SAMSUNG_VARIATION_TEGRA)
-	bool is_xfering;
-	u32 dvc_poweroff_rate;
-#endif
 };
 
 static void dvc_writel(struct tegra_i2c_dev *i2c_dev, u32 val, unsigned long reg)
@@ -774,10 +767,6 @@ static int tegra_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
 		return -EBUSY;
 	}
 
-#if defined(CONFIG_MACH_SAMSUNG_VARIATION_TEGRA)
-	i2c_dev->is_xfering = true;
-#endif
-
 	if (i2c_dev->last_mux != i2c_bus->mux) {
 		tegra_pinmux_set_safe_pinmux_table(i2c_dev->last_mux,
 			i2c_dev->last_mux_len);
@@ -810,10 +799,6 @@ static int tegra_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
 		if (ret)
 			break;
 	}
-
-#if defined(CONFIG_MACH_SAMSUNG_VARIATION_TEGRA)
-	i2c_dev->is_xfering = false;
-#endif
 
 	if (!i2c_dev->is_clkon_always)
 		tegra_i2c_clock_disable(i2c_dev);
@@ -943,12 +928,6 @@ static int tegra_i2c_probe(struct platform_device *pdev)
 	i2c_dev->hs_master_code = plat->hs_master_code;
 	i2c_dev->is_dvc = plat->is_dvc;
 	i2c_dev->arb_recovery = plat->arb_recovery;
-
-#if defined(CONFIG_MACH_SAMSUNG_VARIATION_TEGRA)
-	if (i2c_dev->is_dvc)
-		i2c_dev->dvc_poweroff_rate = 12500;
-#endif
-
 	init_completion(&i2c_dev->msg_complete);
 
 	if (irq == INT_I2C || irq == INT_I2C2 || irq == INT_I2C3)
@@ -1111,63 +1090,6 @@ MODULE_DEVICE_TABLE(of, tegra_i2c_of_match);
 #define tegra_i2c_of_match NULL
 #endif
 
-
-#if defined(CONFIG_MACH_SAMSUNG_VARIATION_TEGRA)
-// static int clk_is_enabled(struct clk *clk)
-// {
-// 	return clk->u.shared_bus_user.enabled;
-// }
-
-static void tegra_i2c_shutdown(struct device *dev)
-{
-	struct platform_device *pdev = to_platform_device(dev);
-	struct tegra_i2c_dev *i2c_dev = platform_get_drvdata(pdev);
-	const unsigned long clk_multiplier = 8;
-
-	if (i2c_dev->is_dvc) {
-		unsigned long rate;
-		int err;
-		// bool is_enabled;
-
-		dev_info(i2c_dev->dev, "%s\n", __func__);
-
-		if (i2c_dev->is_xfering) {
-			dev_err(i2c_dev->dev, "Skip clock change. Transfer in progress.\n");
-			return;
-		}
-
-		// is_enabled = clk_is_enabled(i2c_dev->div_clk);
-		i2c_dev->last_bus_clk_rate = i2c_dev->dvc_poweroff_rate;
-
-		// if (is_enabled)
-		// 	tegra_i2c_clock_disable(i2c_dev);
-
-		err = clk_set_rate(i2c_dev->div_clk, i2c_dev->last_bus_clk_rate * clk_multiplier);
-
-		if (err < 0) {
-			dev_err(i2c_dev->dev, "Clock rate change failed %d\n", err);
-			return;
-		}
-
-		// if (is_enabled) {
-		// 	err = tegra_i2c_clock_enable(i2c_dev);
-		// 	if (err < 0) {
-		// 		dev_err(i2c_dev->dev, "Clock enable failed %d\n", err);
-		// 		return;
-		// 	}
-		// }
-
-		rate = clk_get_rate(i2c_dev->div_clk);
-		rate /= clk_multiplier;
-		dev_info(i2c_dev->dev, "dvc clock set for shutdown. rate=%luhz\n", rate);
-	}
-}
-
-#define TEGRA_I2C_SHUTDOWN tegra_i2c_shutdown
-#else
-#define TEGRA_I2C_SHUTDOWN NULL
-#endif
-
 static struct platform_driver tegra_i2c_driver = {
 	.probe   = tegra_i2c_probe,
 	.remove  = tegra_i2c_remove,
@@ -1176,7 +1098,6 @@ static struct platform_driver tegra_i2c_driver = {
 		.owner = THIS_MODULE,
 		.of_match_table = tegra_i2c_of_match,
 		.pm    = TEGRA_I2C_DEV_PM_OPS,
-		.shutdown = TEGRA_I2C_SHUTDOWN,
 	},
 };
 
