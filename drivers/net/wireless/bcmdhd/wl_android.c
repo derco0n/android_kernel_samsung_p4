@@ -2332,19 +2332,11 @@ static int wifi_resume(struct platform_device *pdev)
 	return 0;
 }
 
-static void wifi_shutdown(struct platform_device *pdev)
-{
-	int err;
-	pr_info("%s\n", __func__);
-	err = wifi_remove(pdev);
-}
-
 static struct platform_driver wifi_device = {
 	.probe          = wifi_probe,
 	.remove         = wifi_remove,
 	.suspend        = wifi_suspend,
 	.resume         = wifi_resume,
-	.shutdown		= wifi_shutdown,
 	.driver         = {
 	.name   = "bcmdhd_wlan",
 	}
