@@ -2334,9 +2334,21 @@ static int wifi_resume(struct platform_device *pdev)
 
 static void wifi_shutdown(struct platform_device *pdev)
 {
-	int err;
+	// int err;
 	pr_info("%s\n", __func__);
-	err = wifi_remove(pdev);
+	// err = wifi_remove(pdev);
+
+	struct wifi_platform_data *wifi_ctrl =
+		(struct wifi_platform_data *)(pdev->dev.platform_data);
+
+	DHD_ERROR(("## %s\n", __FUNCTION__));
+	wifi_control_data = wifi_ctrl;
+
+	wifi_set_power(0, WIFI_TURNOFF_DELAY);	/* Power Off */
+	// wifi_set_carddetect(0);	/* CardDetect (1->0) */
+
+	up(&wifi_control_sem);
+
 }
 
 static struct platform_driver wifi_device = {
