@@ -100,6 +100,8 @@ struct nvhost_device {
 	void (*init)(struct nvhost_device *dev);
 	/* Device is de-initialized. */
 	void (*deinit)(struct nvhost_device *dev);
+
+	int shutdown;
 };
 
 /* Register device to nvhost bus */

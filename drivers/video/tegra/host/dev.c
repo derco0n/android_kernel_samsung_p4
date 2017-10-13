@@ -528,6 +528,8 @@ static int __devinit nvhost_probe(struct nvhost_device *dev)
 
 	nvhost_debug_init(host);
 
+	dev->shutdown = 0;
+
 	dev_info(&dev->dev, "initialized\n");
 	return 0;
 
@@ -565,11 +567,19 @@ static int nvhost_resume(struct nvhost_device *dev)
 	return 0;
 }
 
+static void nvhost_shutdown(struct nvhost_device *dev)
+{
+	pr_info("%s", __func__);
+
+	dev->shutdown = 1;
+}
+
 static struct nvhost_driver nvhost_driver = {
 	.probe = nvhost_probe,
 	.remove = __exit_p(nvhost_remove),
 	.suspend = nvhost_suspend,
 	.resume = nvhost_resume,
+	.shutdown = nvhost_shutdown,
 	.driver = {
 		.owner = THIS_MODULE,
 		.name = DRIVER_NAME
