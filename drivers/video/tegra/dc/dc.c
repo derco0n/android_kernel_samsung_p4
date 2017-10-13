@@ -3242,13 +3242,6 @@ static int tegra_dc_remove(struct nvhost_device *ndev)
 	return 0;
 }
 
-static int tegra_dc_shutdown(struct nvhost_device *ndev)
-{
-	struct tegra_dc *dc = nvhost_get_drvdata(ndev);
-	pr_info("%s\n", __func__);
-	ndev->shutdown = 1;
-}
-
 #ifdef CONFIG_PM
 static int tegra_dc_suspend(struct nvhost_device *ndev, pm_message_t state)
 {
@@ -3391,7 +3384,6 @@ struct nvhost_driver tegra_dc_driver = {
 	},
 	.probe = tegra_dc_probe,
 	.remove = tegra_dc_remove,
-	.shutdown = tegra_dc_shutdown,
 #ifdef CONFIG_PM
 	.suspend = tegra_dc_suspend,
 	.resume = tegra_dc_resume,
